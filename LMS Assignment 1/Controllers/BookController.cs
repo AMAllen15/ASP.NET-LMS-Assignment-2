@@ -27,7 +27,7 @@ public class BookController : ControllerBase
     [HttpPost]
     public IActionResult CreateBook([FromBody] Book book)
     {
-        book.Id = DataRepository.BookList.Count + 1;
+        book.Id = 5000 + DataRepository.BookList.Count + 1;
         DataRepository.BookList.Add(book);
         return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
     }
@@ -58,7 +58,8 @@ public class BookController : ControllerBase
 
         DataRepository.BookList.Remove(book);
 
-        return NoContent(); // 204 No Content
+        // Return a success message
+        return Ok(new { message = "Book successfully removed" });
     }
 }
 

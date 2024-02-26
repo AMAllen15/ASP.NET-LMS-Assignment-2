@@ -27,7 +27,7 @@ public class ReaderController : ControllerBase
     [HttpPost]
     public IActionResult CreateReader([FromBody] Reader reader)
     {
-        reader.Id = DataRepository.ReaderList.Count + 1;
+        reader.Id = 100 + DataRepository.ReaderList.Count + 1;
         DataRepository.ReaderList.Add(reader);
         return CreatedAtAction(nameof(GetReaderById), new { id = reader.Id }, reader);
     }
@@ -58,6 +58,7 @@ public class ReaderController : ControllerBase
 
         DataRepository.ReaderList.Remove(reader);
 
-        return NoContent(); // 204 No Content
+        // Return a success message
+        return Ok(new { message = "Reader successfully removed" });
     }
 }

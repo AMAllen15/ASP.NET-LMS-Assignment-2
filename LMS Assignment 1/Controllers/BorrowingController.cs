@@ -32,6 +32,22 @@ namespace LMS_Assignment_1.Controllers
         [HttpPost]
         public IActionResult CreateBorrowing([FromBody] Borrowing borrowing)
         {
+            if (borrowing.ReaderId == 0)
+            {
+                ModelState.AddModelError("ReaderId", "Reader Id is required");
+            }
+
+            if (borrowing.BookId == 0)
+            {
+                ModelState.AddModelError("BookId", "Book Id is required");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // Model state is invalid, return bad request with model state errors
+                return BadRequest(ModelState);
+            }
+
             // Check if the book is available
             var book = DataRepository.BookList.FirstOrDefault(b => b.Id == borrowing.BookId);
             if (book == null || !book.IsAvailable)
@@ -59,7 +75,6 @@ namespace LMS_Assignment_1.Controllers
             return Ok(new { message = "Borrowing created successfully", borrowing });
         }
 
-        // PUT: api/Borrowing/5
         [HttpPut("{id}")]
         public IActionResult UpdateBorrowing(int id, [FromBody] Borrowing updatedBorrowing)
         {
@@ -70,18 +85,25 @@ namespace LMS_Assignment_1.Controllers
                 return NotFound(new { message = "Borrowing not found" });
             }
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             // Check if the book is available
             var book = DataRepository.BookList.FirstOrDefault(b => b.Id == updatedBorrowing.BookId);
             if (book == null || !book.IsAvailable)
             {
-                return BadRequest(new { message = "Book is not available for borrowing" });
+                
+                return BadRequest(ModelState);
             }
 
             // Check if the reader exists
             var reader = DataRepository.ReaderList.FirstOrDefault(r => r.Id == updatedBorrowing.ReaderId);
             if (reader == null)
             {
-                return BadRequest(new { message = "Reader not found" });
+                ModelState.AddModelError("ReaderId", "Reader not found");
+                return BadRequest(ModelState);
             }
 
             // Update borrowing details
@@ -103,7 +125,7 @@ namespace LMS_Assignment_1.Controllers
             var existingBorrowing = DataRepository.BorrowingList.FirstOrDefault(b => b.Id == id);
             if (existingBorrowing == null)
             {
-                return NotFound(new { message = "Borrowing not found" });
+                return NotFound(new { message = "Borrowing ID not found" });
             }
 
             // Update book availability
@@ -122,3 +144,4 @@ namespace LMS_Assignment_1.Controllers
     }
 }
     
+// Write a if book does not exist, return not found, but also if the book exists but is not available, return a bad request. I'm also trying to get the data annotations to work correctly for this section
